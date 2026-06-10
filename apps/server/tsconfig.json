@@ -1,0 +1,15 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+      "baseUrl": ".",
+      "outDir": "./dist",
+      "declaration": true,
+      "declarationMap": true,
+      "paths": {
+        "@alibi/database": ["../../packages/database/src/index.ts"],
+        "@alibi/database/*": ["../../packages/database/src/*"]
+      }
+    },
+    "include": ["./src/**/*"],
+    "exclude": ["node_modules", "dist"]
+}

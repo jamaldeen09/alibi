@@ -1,0 +1,22 @@
+{
+    "name": "alibi",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "turbo run dev",
+        "turbo:web": "turbo run dev --filter=web",
+        "turbo:database": "turbo run dev --filter=@alibi/database",
+        "build": "turbo run build",
+        "lint": "turbo run lint",
+        "type-check": "turbo run type-check"
+    },
+    "devDependencies": {
+        "@types/node": "^25.9.2",
+        "turbo": "^2.9.17",
+        "typescript": "^6.0.3"
+    },
+    "packageManager": "npm@11.16.0"
+}
