@@ -21,7 +21,10 @@
     "paths": {
       "@/*": ["./*"],
       "@alibi/database": ["../../packages/database/src/index.ts"],
-      "@alibi/database/*": ["../../packages/database/src/*"]
+      "@alibi/database/*": ["../../packages/database/src/*"],
+
+      "@alibi/types": ["../../packages/types/src/index.ts"],
+      "@alibi/types/*": ["../../packages/types/src/*"],
     }
   },
   "include": [

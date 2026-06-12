@@ -12,8 +12,39 @@ datasource db {
   provider = "postgresql"
 }
 
+// =========== Authentication/User =========== \\
+// model Account {
+//   id                       String  @id @default(cuid())
+//   userId                   String
+//   type                     String
+//   provider                 String
+//   providerAccountId        String
+//   refresh_token            String?
+//   access_token             String?
+//   expires_at               Int?
+//   token_type               String?
+//   scope                    String?
+//   id_token                 String?
+//   session_state            String?
+//   refresh_token_expires_in Int?
+//   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Test {
-  id     String             @id @default(cuid())
-  name   String
+//   @@unique([provider, providerAccountId])
+// }
+
+// model Session {
+//   id           String   @id @default(cuid())
+//   sessionToken String   @unique
+//   userId       String
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+
+model User {
+  id        String   @id
+  email     String   @unique
+  username  String?   @unique
+  avatarUrl String @default("https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.magnific.com%2Fvectors%2Fprofile-placeholder&ved=0CBYQjRxqFwoTCNiqqdnv_JQDFQAAAAAdAAAAABAG&opi=89978449") @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
 }
