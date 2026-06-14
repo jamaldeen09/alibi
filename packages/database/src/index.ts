@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma'
+import { PrismaClient } from '../generated/prisma' 
 import { PrismaNeon } from '@prisma/adapter-neon'
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not defined');
 
@@ -20,3 +20,4 @@ if (process.env.NODE_ENV !== "production") globalForDb.db = db
 
 export { db }
 export * from "../generated/prisma"
+export * from "./utils"

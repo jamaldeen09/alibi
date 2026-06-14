@@ -12,34 +12,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// =========== Authentication/User =========== \\
-// model Account {
-//   id                       String  @id @default(cuid())
-//   userId                   String
-//   type                     String
-//   provider                 String
-//   providerAccountId        String
-//   refresh_token            String?
-//   access_token             String?
-//   expires_at               Int?
-//   token_type               String?
-//   scope                    String?
-//   id_token                 String?
-//   session_state            String?
-//   refresh_token_expires_in Int?
-//   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-//   @@unique([provider, providerAccountId])
-// }
-
-// model Session {
-//   id           String   @id @default(cuid())
-//   sessionToken String   @unique
-//   userId       String
-//   expires      DateTime
-//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-// }
-
+// =========== User =========== \\
 model User {
   id        String   @id
   email     String   @unique
@@ -47,4 +20,129 @@ model User {
   avatarUrl String @default("https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.magnific.com%2Fvectors%2Fprofile-placeholder&ved=0CBYQjRxqFwoTCNiqqdnv_JQDFQAAAAAdAAAAABAG&opi=89978449") @map("avatar_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
+
+  cases   Case[]
+}
+
+model Case {
+  id              String   @id @default(uuid())
+  title           String
+  status          String    @default("active") // active, solved, failed
+  creatorId       String   @map("creator_id")
+  
+  
+  victimName      String
+  victimDetails   String    @db.Text
+  location        String    @db.Text
+  
+  hiddenTruth     String    @db.Text // never exposed to clients
+  timeLimit       Int      // in minutes, based on complexity
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  resolvedAt      DateTime? 
+
+  suspects        Suspect[]
+  evidence        Evidence[]
+  witnesses       Witness[]
+  strings         StringConnection[]
+  accusations     Accusation[]
+  caseLogs        CaseLog[]
+  creator         User @relation(fields: [creatorId], references: [id])
+}
+
+model Suspect {
+  id          String   @id @default(uuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  
+  name        String
+  motive      String   @db.Text
+  alibi       String   @db.Text
+  secret      String   @db.Text // used by deception agent, not shown to detectives
+  isKiller    Boolean  @default(false) // ground truth, never exposed
+  
+  status      String   @default("active") // active, cleared
+  heatScore   Int      @default(0)
+  
+  evidenceConnections StringConnection[]
+  accusations         Accusation[]
+}
+
+model Evidence {
+  id            String   @id @default(uuid())
+  caseId        String
+  case          Case     @relation(fields: [caseId], references: [id])
+  
+  label         String   // "Exhibit A — Torn envelope"
+  description   String   @db.Text
+  
+  isDeception   Boolean  @default(false) // flagged if AI planted this
+  createdAt     DateTime @default(now())
+
+  stringConnections StringConnection[]
+}
+
+model Witness {
+  id          String   @id @default(uuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  
+  name        String
+  
+  statements  WitnessStatement[]
+}
+
+model WitnessStatement {
+  id          String   @id @default(uuid())
+  witnessId   String
+  witness     Witness  @relation(fields: [witnessId], references: [id])
+  
+  content     String   @db.Text
+  isDeception Boolean  @default(false)
+  isCurrent   Boolean  @default(true) // only one current statement per witness
+  
+  createdAt   DateTime @default(now())
+}
+
+model StringConnection {
+  id          String   @id @default(uuid())
+  caseId      String
+  case        Case     @relation(fields: [caseId], references: [id])
+  
+  evidenceId  String
+  evidence    Evidence @relation(fields: [evidenceId], references: [id])
+  
+  suspectId   String
+  suspect     Suspect  @relation(fields: [suspectId], references: [id])
+  
+  createdBy   String   // session_id of detective
+  createdAt   DateTime @default(now())
+}
+
+model Accusation {
+  id            String   @id @default(uuid())
+  caseId        String
+  case          Case     @relation(fields: [caseId], references: [id])
+  
+  suspectId     String
+  suspect       Suspect  @relation(fields: [suspectId], references: [id])
+  
+  reasoning     String   @db.Text
+  accusedBy     String   // session_id
+  
+  votesYes      Int      @default(0)
+  votesNo       Int      @default(0)
+  votingClosed  Boolean  @default(false)
+  
+  outcome       String?  // "correct", "incorrect", null if pending
+  createdAt     DateTime @default(now())
+}
+
+model CaseLog {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  
+  message   String   @db.Text
+  createdAt DateTime @default(now())
 }

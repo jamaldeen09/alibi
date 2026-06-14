@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { UiContextProvider } from "@/contexts/UiContext";
+import { SocketContextProvider } from "@/contexts/SocketContext";
 
 const ralewayHeading = Raleway({ subsets: ['latin'], variable: '--font-heading' });
 const raleway = Raleway({ subsets: ['latin'], variable: '--font-sans' })
@@ -29,7 +30,9 @@ export default function RootLayout({
         <ThemeProvider>
           <ClerkProvider>
               <UiContextProvider>
-                {children}
+                <SocketContextProvider url="http://localhost:4080">
+                  {children}
+                </SocketContextProvider>
               </UiContextProvider>
           </ClerkProvider>
         </ThemeProvider>
